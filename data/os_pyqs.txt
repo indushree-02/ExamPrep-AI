@@ -1,0 +1,18 @@
+=== YEAR: 2024 ===
+
+Q1. Explain Deadlock.
+Q2. Explain Paging.
+
+====================================================
+
+=== YEAR: 2023 ===
+
+Q1. Explain Deadlock Prevention.
+Q2. Explain Round Robin Scheduling.
+
+====================================================
+
+=== YEAR: 2022 ===
+
+Q1. Explain Process Scheduling.
+Q2. Write short notes on Paging.

@@ -1,0 +1,33 @@
+=== CHAPTER: Deadlock ===
+
+Definition:
+A deadlock is a condition where two or more processes wait indefinitely for resources held by each other.
+
+Causes:
+1. Mutual Exclusion
+2. Hold and Wait
+3. No Preemption
+4. Circular Wait
+
+Prevention:
+Deadlock prevention eliminates one of the Coffman conditions.
+
+====================================================
+
+=== CHAPTER: Process Scheduling ===
+
+Definition:
+Process scheduling determines which process gets CPU execution.
+
+Algorithms:
+- FCFS
+- SJF
+- Round Robin
+- Priority Scheduling
+
+====================================================
+
+=== CHAPTER: Paging ===
+
+Definition:
+Paging is a memory management technique where logical memory is divided into fixed-size pages.
