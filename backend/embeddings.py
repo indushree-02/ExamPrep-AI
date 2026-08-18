@@ -3,64 +3,122 @@ import os
 from sentence_transformers import SentenceTransformer
 from database import get_collection
 
+# Folder containing study material
 DATA_FOLDER = "../data"
 
+# Load embedding model (loads only once)
 model = SentenceTransformer("all-MiniLM-L6-v2")
 
 
-def split_text(text, chunk_size=500):
+def load_documents():
     """
-    Split long text into smaller chunks.
+    Read all text files from the data folder.
+    """
+
+    documents = []
+
+    for filename in os.listdir(DATA_FOLDER):
+
+        if filename.endswith(".txt"):
+
+            path = os.path.join(DATA_FOLDER, filename)
+
+            with open(path, "r", encoding="utf-8") as file:
+                text = file.read()
+
+            documents.append({
+                "filename": filename,
+                "content": text
+            })
+
+    return documents
+
+
+def split_documents(documents):
+    """
+    Split documents into meaningful chunks.
     """
 
     chunks = []
 
-    for i in range(0, len(text), chunk_size):
-        chunks.append(text[i:i + chunk_size])
+    separator = "=================================================="
+
+    for doc in documents:
+
+        sections = doc["content"].split(separator)
+
+        for section in sections:
+
+            section = section.strip()
+
+            if section:
+
+                chunks.append({
+                    "source": doc["filename"],
+                    "content": section
+                })
 
     return chunks
 
 
-def build_database():
+def store_embeddings(chunks):
+    """
+    Generate embeddings and store them in ChromaDB.
+    """
 
     collection = get_collection()
 
-    # Remove previous data
+    # Delete old data
     existing = collection.get()
 
     if existing["ids"]:
         collection.delete(ids=existing["ids"])
 
-    current_id = 0
+    ids = []
+    documents = []
+    embeddings = []
+    metadatas = []
 
-    for filename in os.listdir(DATA_FOLDER):
+    for i, chunk in enumerate(chunks):
 
-        if not filename.endswith(".txt"):
-            continue
+        embedding = model.encode(chunk["content"]).tolist()
 
-        filepath = os.path.join(DATA_FOLDER, filename)
+        ids.append(str(i))
+        documents.append(chunk["content"])
+        embeddings.append(embedding)
 
-        with open(filepath, "r", encoding="utf-8") as file:
+        metadatas.append({
+            "source": chunk["source"]
+        })
 
-            text = file.read()
+    collection.add(
+        ids=ids,
+        documents=documents,
+        embeddings=embeddings,
+        metadatas=metadatas
+    )
 
-        chunks = split_text(text)
+    return len(ids)
 
-        for chunk in chunks:
 
-            embedding = model.encode(chunk).tolist()
+def build_database():
+    """
+    Complete pipeline:
+    Read → Split → Embed → Store
+    """
 
-            collection.add(
-                ids=[str(current_id)],
-                embeddings=[embedding],
-                documents=[chunk],
-                metadatas=[
-                    {
-                        "source": filename
-                    }
-                ]
-            )
+    documents = load_documents()
 
-            current_id += 1
+    chunks = split_documents(documents)
 
-    return current_id
+    total = store_embeddings(chunks)
+
+    return total
+
+
+if __name__ == "__main__":
+
+    total = build_database()
+
+    print("\nKnowledge Base Created Successfully!")
+    print(f"Stored {total} chunks.")
