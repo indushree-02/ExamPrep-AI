@@ -1,13 +1,16 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+
+from embeddings import build_database
+from retriever import search
+from generator import generate_answer, create_context
 
 app = FastAPI(
     title="ExamPrep AI",
-    version="1.0.0",
-    description="AI-powered Exam Preparation Assistant"
+    version="1.0.0"
 )
 
-# Enable CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -17,15 +20,17 @@ app.add_middleware(
 )
 
 
-# Home Route
+class QuestionRequest(BaseModel):
+    question: str
+
+
 @app.get("/")
 def home():
     return {
-        "message": "Welcome to ExamPrep AI 🚀"
+        "message": "ExamPrep AI Backend Running 🚀"
     }
 
 
-# Health Check
 @app.get("/health")
 def health():
     return {
@@ -33,16 +38,30 @@ def health():
     }
 
 
-# Build Knowledge Base
 @app.post("/build-db")
 def build_db():
-
-    # Lazy import so the embedding model loads only when needed
-    from embeddings import build_database
 
     total_chunks = build_database()
 
     return {
         "message": "Knowledge Base Created Successfully",
         "chunks": total_chunks
+    }
+
+
+@app.post("/ask")
+def ask(request: QuestionRequest):
+
+    chunks = search(request.question)
+
+    context = create_context(chunks)
+
+    answer = generate_answer(
+        request.question,
+        context
+    )
+
+    return {
+        "question": request.question,
+        "answer": answer
     }

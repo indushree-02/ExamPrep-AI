@@ -5,13 +5,10 @@ from dotenv import load_dotenv
 from langchain_groq import ChatGroq
 from langchain_core.messages import HumanMessage
 
-# Load .env
-import os
-from dotenv import load_dotenv
-from langchain_groq import ChatGroq
-
+# Load environment variables
 load_dotenv()
 
+# Initialize Groq LLM
 llm = ChatGroq(
     model=os.getenv("MODEL_NAME"),
     api_key=os.getenv("GROQ_API_KEY"),
@@ -19,14 +16,26 @@ llm = ChatGroq(
 )
 
 
+def create_context(chunks):
+    """
+    Combine retrieved chunks into a single context string.
+    """
+
+    return "\n\n".join(chunks)
+
+
 def generate_answer(question, context):
+    """
+    Generate an exam-oriented answer using the retrieved context.
+    """
 
     prompt = f"""
-You are an AI Exam Preparation Assistant.
+You are ExamPrep AI, an expert academic assistant.
 
-Use ONLY the context below to answer.
+Answer the student's question ONLY using the provided context.
 
-If the answer is not present, say:
+If the answer is not present in the context, reply:
+
 "I couldn't find this information in the uploaded study material."
 
 Context:
@@ -35,7 +44,7 @@ Context:
 Question:
 {question}
 
-Generate the answer in this format:
+Generate the answer in the following format:
 
 Definition
 
@@ -43,7 +52,7 @@ Explanation
 
 Important Exam Points
 
-Related Previous Year Questions (if any)
+Related Previous Year Questions (if available)
 """
 
     response = llm.invoke(
@@ -55,20 +64,29 @@ Related Previous Year Questions (if any)
 
 if __name__ == "__main__":
 
-    context = """
+    chunks = [
+        """
 Deadlock is a condition where two or more processes wait forever.
+
 Four conditions:
-Mutual Exclusion
-Hold and Wait
-No Preemption
-Circular Wait
+1. Mutual Exclusion
+2. Hold and Wait
+3. No Preemption
+4. Circular Wait
+""",
+        """
+2024 PYQ
 
-2024 PYQ:
-Explain Deadlock.
+Q1. Explain Deadlock.
 """
+    ]
 
-    question = "Explain Deadlock"
+    context = create_context(chunks)
 
-    answer = generate_answer(question, context)
+    answer = generate_answer(
+        "Explain Deadlock",
+        context
+    )
 
+    print("\n")
     print(answer)
