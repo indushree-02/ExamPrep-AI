@@ -1,19 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ExamPrep-AI</title>
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <div class="container">
-      <h1>ExamPrep-AI</h1>
-      <p>Ask any exam-style question and get help with study material.</p>
-      <input id="question" placeholder="Type your question here" />
-      <button onclick="askQuestion()">Ask</button>
-      <pre id="output">Waiting for your question...</pre>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ExamPrep AI</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="chat-container">
+
+        <!-- Header -->
+        <div class="header">
+            <h1>🎓 ExamPrep AI</h1>
+            <p>Your AI-powered exam preparation assistant</p>
+        </div>
+
+        <!-- Chat Area -->
+        <div id="chat-box" class="chat-box">
+
+            <div class="message bot-message">
+                <div class="avatar">🤖</div>
+
+                <div class="message-content">
+                    <strong>ExamPrep AI</strong>
+                    <p>
+                        Hello! 👋 Ask me any question from your study material
+                        and I'll help you prepare for your exams.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Input Area -->
+        <div class="input-area">
+
+            <input
+                type="text"
+                id="question"
+                placeholder="Ask your exam question..."
+                autocomplete="off"
+            >
+
+            <button id="ask-button" onclick="askQuestion()">
+                Send
+            </button>
+
+        </div>
+
     </div>
+
     <script src="script.js"></script>
-  </body>
+
+</body>
 </html>
