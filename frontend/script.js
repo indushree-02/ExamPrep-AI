@@ -6,7 +6,6 @@ async function askQuestion() {
 
     const question = questionInput.value.trim();
 
-    // Don't send empty questions
     if (!question) {
         return;
     }
@@ -27,10 +26,9 @@ async function askQuestion() {
 
     chatBox.appendChild(userMessage);
 
-    // Clear input
     questionInput.value = "";
 
-    // Disable button while processing
+    // Disable button
     askButton.disabled = true;
     askButton.textContent = "Thinking...";
 
@@ -50,23 +48,24 @@ async function askQuestion() {
 
     chatBox.appendChild(loadingMessage);
 
-    // Scroll to bottom
     chatBox.scrollTop = chatBox.scrollHeight;
 
     try {
 
-        const response = await fetch("http://127.0.0.1:8000/ask", {
+        const response = await fetch(
+            "http://127.0.0.1:8000/ask",
+            {
+                method: "POST",
 
-            method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
 
-            headers: {
-                "Content-Type": "application/json"
-            },
-
-            body: JSON.stringify({
-                question: question
-            })
-        });
+                body: JSON.stringify({
+                    question: question
+                })
+            }
+        );
 
         if (!response.ok) {
             throw new Error("Backend request failed");
@@ -77,6 +76,23 @@ async function askQuestion() {
         // Remove loading message
         loadingMessage.remove();
 
+        // Create source list
+        let sourcesHTML = "";
+
+        if (data.sources && data.sources.length > 0) {
+
+            sourcesHTML = `
+                <div class="sources">
+                    <strong>📚 Sources</strong>
+                    <ul>
+                        ${data.sources.map(
+                            source => `<li>${escapeHtml(source)}</li>`
+                        ).join("")}
+                    </ul>
+                </div>
+            `;
+        }
+
         // Display AI answer
         const botMessage = document.createElement("div");
 
@@ -86,8 +102,15 @@ async function askQuestion() {
             <div class="avatar">🤖</div>
 
             <div class="message-content">
+
                 <strong>ExamPrep AI</strong>
-                <p>${formatAnswer(data.answer)}</p>
+
+                <div class="answer">
+                    ${formatAnswer(data.answer)}
+                </div>
+
+                ${sourcesHTML}
+
             </div>
         `;
 
@@ -106,6 +129,7 @@ async function askQuestion() {
 
             <div class="message-content">
                 <strong>Error</strong>
+
                 <p>
                     Unable to connect to the ExamPrep AI backend.
                     Please make sure the FastAPI server is running.
@@ -127,15 +151,37 @@ async function askQuestion() {
 }
 
 
-// Convert new lines into HTML line breaks
+// Format AI answer
 function formatAnswer(answer) {
 
-    return escapeHtml(answer)
-        .replace(/\n/g, "<br>");
+    let formatted = escapeHtml(answer);
+
+    // Bold text: **text**
+    formatted = formatted.replace(
+        /\*\*(.*?)\*\*/g,
+        "<strong>$1</strong>"
+    );
+
+    // Bullet points
+    formatted = formatted.replace(
+        /^- (.*)$/gm,
+        "• $1"
+    );
+
+    // Numbered points
+    formatted = formatted.replace(
+        /^(\d+)\. (.*)$/gm,
+        "<strong>$1.</strong> $2"
+    );
+
+    // New lines
+    formatted = formatted.replace(/\n/g, "<br>");
+
+    return formatted;
 }
 
 
-// Prevent HTML injection from user input
+// Prevent HTML injection
 function escapeHtml(text) {
 
     const div = document.createElement("div");
@@ -146,11 +192,14 @@ function escapeHtml(text) {
 }
 
 
-// Allow pressing Enter to send the question
-document.getElementById("question").addEventListener("keydown", function(event) {
+// Press Enter to send
+document.getElementById("question").addEventListener(
+    "keydown",
+    function(event) {
 
-    if (event.key === "Enter") {
-        askQuestion();
+        if (event.key === "Enter") {
+            askQuestion();
+        }
+
     }
-
-});
+);

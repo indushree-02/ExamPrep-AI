@@ -6,11 +6,14 @@ from embeddings import build_database
 from retriever import search
 from generator import generate_answer, create_context
 
+
 app = FastAPI(
     title="ExamPrep AI",
     version="1.0.0"
 )
 
+
+# Allow frontend to communicate with backend
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -52,16 +55,30 @@ def build_db():
 @app.post("/ask")
 def ask(request: QuestionRequest):
 
-    chunks = search(request.question)
+    # Retrieve relevant documents and their metadata
+    documents, metadatas = search(request.question)
 
-    context = create_context(chunks)
+    # Create context for the LLM
+    context = create_context(documents)
 
+    # Generate answer
     answer = generate_answer(
         request.question,
         context
     )
 
+    # Get unique source filenames
+    sources = []
+
+    for metadata in metadatas:
+
+        source = metadata.get("source")
+
+        if source and source not in sources:
+            sources.append(source)
+
     return {
         "question": request.question,
-        "answer": answer
+        "answer": answer,
+        "sources": sources
     }

@@ -131,11 +131,15 @@ body {
 }
 
 .message-content strong {
-    display: block;
+    display: inline;
 
     margin-bottom: 5px;
 
     color: #4f46e5;
+}
+
+.message-content > strong {
+    display: block;
 }
 
 .message-content p {
@@ -215,6 +219,35 @@ body {
     background: #9ca3af;
 
     cursor: not-allowed;
+}
+
+
+/* Sources */
+
+.sources {
+    margin-top: 18px;
+
+    padding-top: 12px;
+
+    border-top: 1px solid #e5e7eb;
+
+    font-size: 14px;
+}
+
+.sources strong {
+    color: #4f46e5;
+}
+
+.sources ul {
+    margin: 8px 0 0;
+
+    padding-left: 20px;
+}
+
+.sources li {
+    margin-bottom: 4px;
+
+    color: #4b5563;
 }
 
 
