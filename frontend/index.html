@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,26 +16,44 @@
 
         <!-- Header -->
         <div class="header">
-            <h1>🎓 ExamPrep AI</h1>
-            <p>Your AI-powered exam preparation assistant</p>
+
+            <div class="header-title">
+                <h1>🎓 ExamPrep AI</h1>
+                <p>Your AI-powered exam preparation assistant</p>
+            </div>
+
+            <button id="clear-button" onclick="clearChat()">
+                🗑️ Clear
+            </button>
+
         </div>
+
 
         <!-- Chat Area -->
         <div id="chat-box" class="chat-box">
 
+            <!-- Welcome Message -->
             <div class="message bot-message">
-                <div class="avatar">🤖</div>
+
+                <div class="avatar">
+                    🤖
+                </div>
 
                 <div class="message-content">
+
                     <strong>ExamPrep AI</strong>
+
                     <p>
                         Hello! 👋 Ask me any question from your study material
                         and I'll help you prepare for your exams.
                     </p>
+
                 </div>
+
             </div>
 
         </div>
+
 
         <!-- Input Area -->
         <div class="input-area">
@@ -54,7 +73,9 @@
 
     </div>
 
+
     <script src="script.js"></script>
 
 </body>
+
 </html>

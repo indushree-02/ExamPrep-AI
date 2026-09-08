@@ -28,9 +28,10 @@ async function askQuestion() {
 
     questionInput.value = "";
 
-    // Disable button
+    // Disable buttons while processing
     askButton.disabled = true;
     askButton.textContent = "Thinking...";
+
 
     // Loading message
     const loadingMessage = document.createElement("div");
@@ -50,6 +51,7 @@ async function askQuestion() {
 
     chatBox.scrollTop = chatBox.scrollHeight;
 
+
     try {
 
         const response = await fetch(
@@ -67,31 +69,39 @@ async function askQuestion() {
             }
         );
 
+
         if (!response.ok) {
             throw new Error("Backend request failed");
         }
 
+
         const data = await response.json();
+
 
         // Remove loading message
         loadingMessage.remove();
 
-        // Create source list
+
+        // Create sources section
         let sourcesHTML = "";
 
         if (data.sources && data.sources.length > 0) {
 
             sourcesHTML = `
                 <div class="sources">
+
                     <strong>📚 Sources</strong>
+
                     <ul>
                         ${data.sources.map(
                             source => `<li>${escapeHtml(source)}</li>`
                         ).join("")}
                     </ul>
+
                 </div>
             `;
         }
+
 
         // Display AI answer
         const botMessage = document.createElement("div");
@@ -99,7 +109,10 @@ async function askQuestion() {
         botMessage.className = "message bot-message";
 
         botMessage.innerHTML = `
-            <div class="avatar">🤖</div>
+
+            <div class="avatar">
+                🤖
+            </div>
 
             <div class="message-content">
 
@@ -112,29 +125,38 @@ async function askQuestion() {
                 ${sourcesHTML}
 
             </div>
+
         `;
 
         chatBox.appendChild(botMessage);
 
+
     } catch (error) {
 
         loadingMessage.remove();
+
 
         const errorMessage = document.createElement("div");
 
         errorMessage.className = "message bot-message";
 
         errorMessage.innerHTML = `
-            <div class="avatar">⚠️</div>
+
+            <div class="avatar">
+                ⚠️
+            </div>
 
             <div class="message-content">
+
                 <strong>Error</strong>
 
                 <p>
                     Unable to connect to the ExamPrep AI backend.
                     Please make sure the FastAPI server is running.
                 </p>
+
             </div>
+
         `;
 
         chatBox.appendChild(errorMessage);
@@ -151,10 +173,47 @@ async function askQuestion() {
 }
 
 
+
+// Clear the entire conversation
+function clearChat() {
+
+    const chatBox = document.getElementById("chat-box");
+
+    chatBox.innerHTML = `
+
+        <div class="message bot-message">
+
+            <div class="avatar">
+                🤖
+            </div>
+
+            <div class="message-content">
+
+                <strong>ExamPrep AI</strong>
+
+                <p>
+                    Hello! 👋 Ask me any question from your study material
+                    and I'll help you prepare for your exams.
+                </p>
+
+            </div>
+
+        </div>
+
+    `;
+
+    // Clear input field
+    document.getElementById("question").value = "";
+
+}
+
+
+
 // Format AI answer
 function formatAnswer(answer) {
 
     let formatted = escapeHtml(answer);
+
 
     // Bold text: **text**
     formatted = formatted.replace(
@@ -162,11 +221,13 @@ function formatAnswer(answer) {
         "<strong>$1</strong>"
     );
 
+
     // Bullet points
     formatted = formatted.replace(
         /^- (.*)$/gm,
         "• $1"
     );
+
 
     // Numbered points
     formatted = formatted.replace(
@@ -174,11 +235,14 @@ function formatAnswer(answer) {
         "<strong>$1.</strong> $2"
     );
 
+
     // New lines
     formatted = formatted.replace(/\n/g, "<br>");
 
+
     return formatted;
 }
+
 
 
 // Prevent HTML injection
@@ -192,7 +256,8 @@ function escapeHtml(text) {
 }
 
 
-// Press Enter to send
+
+// Press Enter to send question
 document.getElementById("question").addEventListener(
     "keydown",
     function(event) {
